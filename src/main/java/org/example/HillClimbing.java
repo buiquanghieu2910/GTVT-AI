@@ -56,7 +56,7 @@ public class HillClimbing {
         hillClimb(start, end);
 
         // Ghi kết quả vào file
-        saveResult("HillClimbingOutput.txt", start, end);
+        saveResult("file//output//HillClimbingOutput.txt", start, end);
     }
 
     // Hàm thực hiện Hill Climbing với hàng đợi ưu tiên
@@ -116,7 +116,7 @@ public class HillClimbing {
     public static void main(String[] args) {
         HillClimbing hillClimbSearch = new HillClimbing();
         try {
-            hillClimbSearch.loadGraph("HillClimbingInput.txt");
+            hillClimbSearch.loadGraph("file//input//HillClimbingInput.txt");
         } catch (IOException e) {
             System.out.println("Đã xảy ra lỗi khi đọc hoặc ghi file.");
             e.printStackTrace();

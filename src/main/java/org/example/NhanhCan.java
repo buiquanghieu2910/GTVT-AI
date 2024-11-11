@@ -50,7 +50,7 @@ public class NhanhCan {
         branchAndBound(start, end);
 
         // Ghi kết quả vào file
-        saveResult("NhanhCanOutput.txt", start, end);
+        saveResult("file//output//NhanhCanOutput.txt", start, end);
     }
 
     // Hàm thực hiện Branch and Bound
@@ -125,7 +125,7 @@ public class NhanhCan {
     public static void main(String[] args) {
         NhanhCan search = new NhanhCan();
         try {
-            search.loadGraph("NhanhCanInput.txt");
+            search.loadGraph("file//input//NhanhCanInput.txt");
         } catch (IOException e) {
             System.out.println("Đã xảy ra lỗi khi đọc hoặc ghi file.");
             e.printStackTrace();

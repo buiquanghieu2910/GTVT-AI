@@ -127,7 +127,7 @@ public class DFS {
         DFS dfs = new DFS();
 
         // Đọc đồ thị từ tệp DFSInput.txt
-        dfs.readGraphFromFile("DFSInput.txt");
+        dfs.readGraphFromFile("file//input//DFSInput.txt");
 
         // Thực hiện DFS và in đường đi
         List<String> resultPath = dfs.dfs();
@@ -146,6 +146,6 @@ public class DFS {
         }
 
         // Ghi kết quả vào tệp output.txt
-        dfs.writeResultsToFile("DFSOutput.txt", resultPath, steps);
+        dfs.writeResultsToFile("file//output//DFSOutput.txt", resultPath, steps);
     }
 }
