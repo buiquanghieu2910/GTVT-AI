@@ -6,3 +6,6 @@ I G
 E G K
 F K
 G
+
+A
+G

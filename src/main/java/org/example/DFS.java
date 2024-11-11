@@ -3,28 +3,49 @@ package org.example;
 import java.io.*;
 import java.util.*;
 
-public class DFSStack {
+public class DFS {
     // Đồ thị biểu diễn dưới dạng danh sách kề
     private Map<String, List<String>> graph = new HashMap<>();
     private List<String> steps = new ArrayList<>();
+    private String startNode;
+    private String goalNode;
 
     // Phương thức đọc đồ thị từ file
     public void readGraphFromFile(String filename) {
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
+            List<String> lines = new ArrayList<>();
+
+            // Đọc tất cả các dòng từ file
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split(" ");
+                lines.add(line);
+            }
+
+            // Bỏ qua dòng trống cuối trước khi đọc đỉnh bắt đầu và kết thúc
+            int lastIndex = lines.size() - 1;
+            while (lastIndex >= 0 && lines.get(lastIndex).trim().isEmpty()) {
+                lastIndex--;
+            }
+
+            // Đặt đỉnh bắt đầu và đỉnh kết thúc từ các dòng cuối cùng (bỏ qua dòng trống)
+            goalNode = lines.get(lastIndex).trim();         // Dòng cuối có đỉnh kết thúc
+            startNode = lines.get(lastIndex - 1).trim();    // Dòng trước đó có đỉnh bắt đầu
+
+            // Đọc các đỉnh và cạnh trong các dòng trước đó
+            for (int i = 0; i < lastIndex - 1; i++) {
+                String[] parts = lines.get(i).split(" ");
                 String node = parts[0]; // Phần tử đầu tiên là đỉnh
                 List<String> neighbors = new ArrayList<>(List.of(Arrays.copyOfRange(parts, 1, parts.length)));
                 graph.put(node, neighbors);
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     // Hàm DFS sử dụng ngăn xếp để tìm đường từ đỉnh bắt đầu đến đỉnh đích
-    public List<String> dfs(String startNode, String goalNode) {
+    public List<String> dfs() {
         Stack<String> stack = new Stack<>();
         Set<String> visited = new HashSet<>();
         Map<String, String> parentMap = new HashMap<>(); // Lưu lại đỉnh trước đó để truy vết đường đi
@@ -79,22 +100,43 @@ public class DFSStack {
         return steps;
     }
 
-    public static void main(String[] args) {
-        DFSStack dfs = new DFSStack();
-        String start = "A";  // Đỉnh bắt đầu
-        String goal = "G";   // Đỉnh đích
+    // Phương thức ghi kết quả vào file
+    private void writeResultsToFile(String filename, List<String> resultPath, List<String> steps) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            if (!resultPath.isEmpty()) {
+                writer.write("Path from start to goal: " + String.join(" -> ", resultPath));
+                writer.newLine();
+            } else {
+                writer.write("No path found from start to goal");
+                writer.newLine();
+            }
 
-        // Đọc đồ thị từ tệp input.txt
-        dfs.readGraphFromFile("C:\\Users\\buiqu\\Downloads\\input.txt");
+            writer.newLine();
+            writer.write("Steps taken:");
+            writer.newLine();
+            for (String step : steps) {
+                writer.write(step);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        DFS dfs = new DFS();
+
+        // Đọc đồ thị từ tệp DFSInput.txt
+        dfs.readGraphFromFile("DFSInput.txt");
 
         // Thực hiện DFS và in đường đi
-        List<String> resultPath = dfs.dfs(start, goal);
+        List<String> resultPath = dfs.dfs();
         List<String> steps = dfs.getSteps();
 
         if (!resultPath.isEmpty()) {
-            System.out.println("Path from " + start + " to " + goal + ": " + String.join(" -> ", resultPath));
+            System.out.println("Path from " + dfs.startNode + " to " + dfs.goalNode + ": " + String.join(" -> ", resultPath));
         } else {
-            System.out.println("No path found from " + start + " to " + goal);
+            System.out.println("No path found from " + dfs.startNode + " to " + dfs.goalNode);
         }
 
         // In bảng các bước thực hiện
@@ -102,5 +144,8 @@ public class DFSStack {
         for (String step : steps) {
             System.out.println(step);
         }
+
+        // Ghi kết quả vào tệp output.txt
+        dfs.writeResultsToFile("DFSOutput.txt", resultPath, steps);
     }
 }

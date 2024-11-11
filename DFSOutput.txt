@@ -1,0 +1,29 @@
+Path from start to goal: A -> C -> E -> G
+
+Steps taken:
+Visited node: A
+Neighbors of A: [B, C, D]
+Stack: [B, C, D]
+
+Visited node: D
+Neighbors of D: [C, F]
+Stack: [B, C, F]
+
+Visited node: F
+Neighbors of F: [K]
+Stack: [B, C, K]
+
+Visited node: K
+Neighbors of K: []
+Stack: [B, C]
+
+Visited node: C
+Neighbors of C: [E, F]
+Stack: [B, E]
+
+Visited node: E
+Neighbors of E: [G, K]
+Stack: [B, G]
+
+Visited node: G
+Neighbors of G: []

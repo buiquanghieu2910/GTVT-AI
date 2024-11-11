@@ -1,0 +1,13 @@
+Đã tìm thấy đường đi từ A đến B:
+A D D E E I I B B 
+Tổng chi phí: 19
+Các bước thực hiện thuật toán:
+Thăm đỉnh A
+Thăm đỉnh D
+Thăm đỉnh D
+Thăm đỉnh E
+Thăm đỉnh E
+Thăm đỉnh I
+Thăm đỉnh I
+Thăm đỉnh B
+Thăm đỉnh B
