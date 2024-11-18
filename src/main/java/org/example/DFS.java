@@ -4,37 +4,32 @@ import java.io.*;
 import java.util.*;
 
 public class DFS {
-    // Đồ thị biểu diễn dưới dạng danh sách kề
     private Map<String, List<String>> graph = new HashMap<>();
-    private List<String> steps = new ArrayList<>();
+    private List<String[]> steps = new ArrayList<>(); // Mỗi bước là một mảng: [Đỉnh phát triển, Đỉnh kề, Stack]
+    private List<String> approvedPeak = new ArrayList<>();
     private String startNode;
     private String goalNode;
 
-    // Phương thức đọc đồ thị từ file
     public void readGraphFromFile(String filename) {
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
             List<String> lines = new ArrayList<>();
 
-            // Đọc tất cả các dòng từ file
             while ((line = br.readLine()) != null) {
                 lines.add(line);
             }
 
-            // Bỏ qua dòng trống cuối trước khi đọc đỉnh bắt đầu và kết thúc
             int lastIndex = lines.size() - 1;
             while (lastIndex >= 0 && lines.get(lastIndex).trim().isEmpty()) {
                 lastIndex--;
             }
 
-            // Đặt đỉnh bắt đầu và đỉnh kết thúc từ các dòng cuối cùng (bỏ qua dòng trống)
-            goalNode = lines.get(lastIndex).trim();         // Dòng cuối có đỉnh kết thúc
-            startNode = lines.get(lastIndex - 1).trim();    // Dòng trước đó có đỉnh bắt đầu
+            goalNode = lines.get(lastIndex).trim();
+            startNode = lines.get(lastIndex - 1).trim();
 
-            // Đọc các đỉnh và cạnh trong các dòng trước đó
             for (int i = 0; i < lastIndex - 1; i++) {
                 String[] parts = lines.get(i).split(" ");
-                String node = parts[0]; // Phần tử đầu tiên là đỉnh
+                String node = parts[0];
                 List<String> neighbors = new ArrayList<>(List.of(Arrays.copyOfRange(parts, 1, parts.length)));
                 graph.put(node, neighbors);
             }
@@ -44,45 +39,45 @@ public class DFS {
         }
     }
 
-    // Hàm DFS sử dụng ngăn xếp để tìm đường từ đỉnh bắt đầu đến đỉnh đích
     public List<String> dfs() {
         Stack<String> stack = new Stack<>();
         Set<String> visited = new HashSet<>();
-        Map<String, String> parentMap = new HashMap<>(); // Lưu lại đỉnh trước đó để truy vết đường đi
+        Map<String, String> parentMap = new HashMap<>();
         stack.push(startNode);
         visited.add(startNode);
-
-        // Lặp đến khi ngăn xếp trống
         while (!stack.isEmpty()) {
+
             String currentNode = stack.pop();
-            steps.add("Visited node: " + currentNode);
+            approvedPeak.add(currentNode);
 
-            // In các đỉnh kề của currentNode
+            // Lấy các đỉnh kề
             List<String> neighbors = graph.getOrDefault(currentNode, new ArrayList<>());
-            steps.add("Neighbors of " + currentNode + ": " + neighbors);
 
-            // Nếu tìm thấy đỉnh đích
-            if (currentNode.equals(goalNode)) {
-                return constructPath(parentMap, startNode, goalNode);
-            }
-
-            // Đẩy các đỉnh kề vào ngăn xếp theo đúng thứ tự từ trái sang phải (ngăn xếp sẽ xử lý từ phải sang trái)
+            // Đẩy các đỉnh kề vào ngăn xếp
             for (String neighbor : neighbors) {
                 if (!visited.contains(neighbor)) {
                     stack.push(neighbor);
                     visited.add(neighbor);
-                    parentMap.put(neighbor, currentNode); // Lưu lại cha của đỉnh này để truy vết
+                    parentMap.put(neighbor, currentNode);
                 }
             }
 
-            // In trạng thái hiện tại của ngăn xếp (không cần đảo ngược)
-            steps.add("Stack: " + stack + "\n"); // In ra ngăn xếp như đang lưu trữ
+            // Thêm bước hiện tại vào danh sách (sau khi cập nhật stack)
+            steps.add(new String[] {
+                    currentNode,                // Đỉnh phát triển
+                    neighbors.toString(),       // Đỉnh kề
+                    approvedPeak.toString(),    // Đỉnh đã duyệt
+                    stack.toString()            // Trạng thái stack
+            });
+
+            if (currentNode.equals(goalNode)) {
+                return constructPath(parentMap, startNode, goalNode);
+            }
         }
 
-        return Collections.emptyList(); // Trả về danh sách rỗng nếu không tìm thấy đường
+        return Collections.emptyList();
     }
 
-    // Phương thức truy vết lại đường đi từ đỉnh bắt đầu đến đỉnh đích
     private List<String> constructPath(Map<String, String> parentMap, String startNode, String goalNode) {
         List<String> path = new ArrayList<>();
         String current = goalNode;
@@ -92,30 +87,30 @@ public class DFS {
             current = parentMap.get(current);
         }
 
-        Collections.reverse(path); // Đảo ngược đường đi để có đúng thứ tự từ start -> goal
+        Collections.reverse(path);
         return path;
     }
 
-    public List<String> getSteps() {
-        return steps;
-    }
-
-    // Phương thức ghi kết quả vào file
-    private void writeResultsToFile(String filename, List<String> resultPath, List<String> steps) {
+    public void writeResultsToFile(String filename, List<String> resultPath, List<String[]> steps) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+
+            writer.write(String.format("%-20s %-30s %-30s %-30s", "Đỉnh phát triển", "Đỉnh kề", "Đỉnh đã duyệt",
+                    "Danh sách trong stack"));
+            writer.newLine();
+            writer.write("=".repeat(105));
+            writer.newLine();
+
+            for (String[] step : steps) {
+                writer.write(String.format("%-20s %-30s %-30s %-30s", step[0], step[1], step[2], step[3]));
+                writer.newLine();
+            }
             if (!resultPath.isEmpty()) {
-                writer.write("Path from start to goal: " + String.join(" -> ", resultPath));
+                writer.write("Đường đi: " + String.join(" -> ", resultPath));
+                writer.newLine();
                 writer.newLine();
             } else {
                 writer.write("No path found from start to goal");
                 writer.newLine();
-            }
-
-            writer.newLine();
-            writer.write("Steps taken:");
-            writer.newLine();
-            for (String step : steps) {
-                writer.write(step);
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -126,12 +121,8 @@ public class DFS {
     public static void main(String[] args) {
         DFS dfs = new DFS();
 
-        // Đọc đồ thị từ tệp DFSInput.txt
         dfs.readGraphFromFile("file//input//DFSInput.txt");
-
-        // Thực hiện DFS và in đường đi
         List<String> resultPath = dfs.dfs();
-        List<String> steps = dfs.getSteps();
 
         if (!resultPath.isEmpty()) {
             System.out.println("Path from " + dfs.startNode + " to " + dfs.goalNode + ": " + String.join(" -> ", resultPath));
@@ -139,13 +130,13 @@ public class DFS {
             System.out.println("No path found from " + dfs.startNode + " to " + dfs.goalNode);
         }
 
-        // In bảng các bước thực hiện
         System.out.println("\nSteps taken:");
-        for (String step : steps) {
-            System.out.println(step);
+        System.out.printf("%-20s %-30s %-30s\n", "Đỉnh phát triển", "Đỉnh kề", "Danh sách trong stack");
+        System.out.println("=".repeat(80));
+        for (String[] step : dfs.steps) {
+            System.out.printf("%-20s %-30s %-30s\n", step[0], step[1], step[2]);
         }
 
-        // Ghi kết quả vào tệp output.txt
-        dfs.writeResultsToFile("file//output//DFSOutput.txt", resultPath, steps);
+        dfs.writeResultsToFile("file//output//DFSOutput.txt", resultPath, dfs.steps);
     }
 }

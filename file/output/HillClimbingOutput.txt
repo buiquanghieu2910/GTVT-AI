@@ -1,7 +1,0 @@
-Đã tìm thấy đường đi từ A đến B:
-A-20 E-7 G-5 B-0 
-Các bước thực hiện thuật toán:
-Thăm đỉnh A (giá trị: 20)
-Thăm đỉnh E (giá trị: 7)
-Thăm đỉnh G (giá trị: 5)
-Thăm đỉnh B (giá trị: 0)
